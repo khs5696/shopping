@@ -4,33 +4,54 @@ import Nav from "./components/Nav/Nav";
 import Cart from "./components/Cart/Cart";
 import Main from "./components/Main/Main";
 import Item from "./components/Item/Item";
-import data from "MOCK_DATA.json"; // https://mockaroo.com/로부터 Dummy 데이터를 받아온다.
+import data from "MOCK_DATA.json";
 
-// App.js에서 dummy data를 불러옴으로써 최상단 컴포넌트로 잡고
-// state를 결정하기 위해 class 컴포넌트로 변경한다.
 class App extends Component {
   constructor() {
     super();
     this.state = {
-      // dummy data를 state로 지정
       products: data
     };
+    this.renderFoodDetail = this.renderFoodDetail.bind(this);
   };
 
-  // React의 life cycle과 관련된 메소드로
-  // 컴포넌트가 DOM에 마운트 된 후 실행된다.
-  // App 컴포넌트가 실행될 때 어떠한 기능을 실행할지 결정
-  componentDidMount() {
-    console.log(this.state.products)
-  };
+  // map 함수를 통해 각 제품의 url을 생성한다. `/item/${product.id}`
+  // 각 제품의 item 컴포넌트에 props를 전달한다.
+  renderFoodDetail() {
+    return this.state.products.map(product => {
+      return (
+        <Route
+          exact path = {`/item/${product.id}`}
+          render = {props => {
+            return (
+              <Item
+                imgage = {product.image}
+                name = {product.name}
+                price = {product.price}
+                id = {product.id}
+                key = {product.id}
+              />
+            )
+          }}
+        />
+      );
+    });
+  }
+
 
   render() {
     return (
       <div>
         <Nav />
         <Switch>
-          <Route exact path = "/"  component = {Main} />
-          <Route exact path = "/cart" component = {Cart} />
+          <Route 
+            exact path = "/"  
+            render = {props => {
+              // App 컴포넌트에서 Main 컴포넌트로 props 전달
+              return (<Main products = {this.state.products}/>);
+            }}  
+          />
+          {this.renderFoodDetail()}
         </Switch>
       </div>
     );
